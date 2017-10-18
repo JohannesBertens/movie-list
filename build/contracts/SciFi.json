@@ -1,0 +1,102 @@
+{
+  "contract_name": "SciFi",
+  "abi": [
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "name": "movies",
+      "outputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [],
+      "name": "movie_num",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": true,
+      "inputs": [
+        {
+          "name": "",
+          "type": "bytes32"
+        }
+      ],
+      "name": "bids",
+      "outputs": [
+        {
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "payable": false,
+      "type": "function"
+    },
+    {
+      "constant": false,
+      "inputs": [
+        {
+          "name": "name",
+          "type": "bytes32"
+        }
+      ],
+      "name": "vote",
+      "outputs": [],
+      "payable": true,
+      "type": "function"
+    }
+  ],
+  "unlinked_binary": "0x6060604052341561000f57600080fd5b5b6101a28061001f6000396000f300606060405263ffffffff7c0100000000000000000000000000000000000000000000000000000000600035041663404ebf6c811461005e57806377ef5ed3146100865780638f98eeda146100ab578063a69beaba146100d3575b600080fd5b341561006957600080fd5b6100746004356100e0565b60405190815260200160405180910390f35b341561009157600080fd5b6100746100fa565b60405190815260200160405180910390f35b34156100b657600080fd5b610074600435610102565b60405190815260200160405180910390f35b6100de600435610114565b005b600181620f424081106100ef57fe5b0160005b5054905081565b620f42415481565b60006020819052908152604090205481565b600034151561012257610172565b5060008181526020819052604090205480151561015d57620f424180546001818101909255839190620f4240811061015657fe5b0160005b50555b60008281526020819052604090208054340190555b50505600a165627a7a72305820855e0129df7c05569e240c1a1d066f5dafd67cf7032be00247910c9195e04ed60029",
+  "networks": {
+    "1508350620419": {
+      "events": {},
+      "links": {},
+      "address": "0x3c4b0b977d6b129c88ee954a23ebe38c0a7da9b5",
+      "updated_at": 1508350625382
+    },
+    "1508351104645": {
+      "events": {},
+      "links": {},
+      "address": "0xc9c39f144a3d3b3233a78d3ffaa6cdbcaa30bdb5",
+      "updated_at": 1508351114711
+    },
+    "1508352883110": {
+      "events": {},
+      "links": {},
+      "address": "0x580c58e5db850a72e8b0cfe0aab2131ff357dfa3",
+      "updated_at": 1508352886728
+    },
+    "1508354114596": {
+      "events": {},
+      "links": {},
+      "address": "0x4983600f54a46c3fc78bb234d2b234538acf9742",
+      "updated_at": 1508354120784
+    },
+    "1508354428219": {
+      "events": {},
+      "links": {},
+      "address": "0x6e988f894c0d488b573efdddd5e9ee82fdb036d8",
+      "updated_at": 1508354434216
+    }
+  },
+  "schema_version": "0.0.5",
+  "updated_at": 1508354434216
+}

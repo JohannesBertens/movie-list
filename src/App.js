@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-import SimpleStorageContract from '../build/contracts/SimpleStorage.json'
+import SciFiContract from '../build/contracts/SciFi.json'
 import getWeb3 from './utils/getWeb3'
 
 import './css/oswald.css'
@@ -12,7 +12,8 @@ class App extends Component {
     super(props)
 
     this.state = {
-      storageValue: 0,
+      movieNum: 0,
+      movies: [],
       web3: null
     }
   }
@@ -22,17 +23,17 @@ class App extends Component {
     // See utils/getWeb3 for more info.
 
     getWeb3
-    .then(results => {
-      this.setState({
-        web3: results.web3
-      })
+      .then(results => {
+        this.setState({
+          web3: results.web3
+        })
 
-      // Instantiate contract once web3 provided.
-      this.instantiateContract()
-    })
-    .catch(() => {
-      console.log('Error finding web3.')
-    })
+        // Instantiate contract once web3 provided.
+        this.instantiateContract()
+      })
+      .catch(() => {
+        console.log('Error finding web3.')
+      })
   }
 
   instantiateContract() {
@@ -44,45 +45,65 @@ class App extends Component {
      */
 
     const contract = require('truffle-contract')
-    const simpleStorage = contract(SimpleStorageContract)
-    simpleStorage.setProvider(this.state.web3.currentProvider)
+    const sciFi = contract(SciFiContract);
+    sciFi.setProvider(this.state.web3.currentProvider);
+    var sciFiInstance;
 
-    // Declaring this for later so we can chain functions on SimpleStorage.
-    var simpleStorageInstance
+    var setMovieDetails = function (instance, _this, index) {
+      var movieName;
+      instance.movies.call(index).then((res) => {
+        movieName = _this.state.web3.toAscii(res).trim().replace(/[^A-Za-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
+        instance.bids.call(res).then((res) => {
+          _this.setState({ movies: [..._this.state.movies, movieName + ' [' + res + ']'] });
+        });
+      });
+    }
 
-    // Get accounts.
     this.state.web3.eth.getAccounts((error, accounts) => {
-      simpleStorage.deployed().then((instance) => {
-        simpleStorageInstance = instance
+      sciFi.deployed().then((instance) => {
+        sciFiInstance = instance;
+        console.log(instance);
 
-        // Stores a given value, 5 by default.
-        return simpleStorageInstance.set(5, {from: accounts[0]})
-      }).then((result) => {
-        // Get the value from the contract to prove it worked.
-        return simpleStorageInstance.get.call(accounts[0])
-      }).then((result) => {
-        // Update state with the result.
-        return this.setState({ storageValue: result.c[0] })
-      })
-    })
+        var name = this.state.web3.fromAscii('Terminator 2');        
+        sciFiInstance.vote(name, { value: 200, from: accounts[0] }).then((result) => {
+          // Get the movies from the contract
+          sciFiInstance.movie_num.call().then((res) => {
+            var movieNum = res.c[0];
+
+            this.setState({ movieNum: movieNum });
+            this.setState({ movies: [] });
+
+            // Get list of movies with bids
+            for (var i = 0; i < movieNum; i++) {
+              setMovieDetails(sciFiInstance, this, i);
+            }
+
+          });
+
+        });
+
+      });
+    });
+
   }
 
   render() {
     return (
       <div className="App">
         <nav className="navbar pure-menu pure-menu-horizontal">
-            <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
+          <a href="#" className="pure-menu-heading pure-menu-link">Truffle Box</a>
         </nav>
 
         <main className="container">
           <div className="pure-g">
             <div className="pure-u-1-1">
               <h1>Good to Go!</h1>
-              <p>Your Truffle Box is installed and ready.</p>
-              <h2>Smart Contract Example</h2>
-              <p>If your contracts compiled and migrated successfully, below will show a stored value of 5 (by default).</p>
-              <p>Try changing the value stored on <strong>line 59</strong> of App.js.</p>
-              <p>The stored value is: {this.state.storageValue}</p>
+              <p>The movies are:</p>
+              <ul>
+                {this.state.movies.map(function (name, index) {
+                  return <li key={index}>{name}</li>;
+                })}
+              </ul>
             </div>
           </div>
         </main>
