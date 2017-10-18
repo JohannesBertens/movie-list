@@ -14,7 +14,10 @@ class App extends Component {
     this.state = {
       movieNum: 0,
       movies: [],
-      web3: null
+      toVote: 'New Movie',
+      web3: null,
+      sciFiInstance: null,
+      account: null
     }
   }
 
@@ -36,6 +39,44 @@ class App extends Component {
       })
   }
 
+  updateValue(modifiedValue) {
+    this.setState({
+      toVote: modifiedValue.target.value
+    })
+  }
+
+  voteFromButton = () => {
+    this.voteForMovie(this.state.toVote, () => this.updateState());
+  }
+
+  voteForMovie = (movie, callback) => {
+    var name = this.state.web3.fromAscii(movie);
+    this.state.sciFiInstance.vote(name, { value: 200, from: this.state.account }).then(callback);
+  }
+
+  updateState = () => {
+    this.state.sciFiInstance.movie_num.call().then((res) => {
+      this.setState({ movieNum: res.c[0] });
+      this.setState({ movies: [] });
+
+      // Get list of movies with bids
+      for (var i = 0; i < this.state.movieNum; i++) {
+        this.setMovieDetails(i);
+      }
+    });
+  }
+
+
+  setMovieDetails = (index) => {
+    var movieName;
+    this.state.sciFiInstance.movies.call(index).then((res) => {
+      movieName = this.state.web3.toAscii(res).trim().replace(/[^A-Za-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
+      this.state.sciFiInstance.bids.call(res).then((res) => {
+        this.setState({ movies: [...this.state.movies, movieName + ' [' + res + ']'] });
+      });
+    });
+  }
+
   instantiateContract() {
     /*
      * SMART CONTRACT EXAMPLE
@@ -47,39 +88,16 @@ class App extends Component {
     const contract = require('truffle-contract')
     const sciFi = contract(SciFiContract);
     sciFi.setProvider(this.state.web3.currentProvider);
-    var sciFiInstance;
-
-    var setMovieDetails = function (instance, _this, index) {
-      var movieName;
-      instance.movies.call(index).then((res) => {
-        movieName = _this.state.web3.toAscii(res).trim().replace(/[^A-Za-z 0-9 \.,\?""!@#\$%\^&\*\(\)-_=\+;:<>\/\\\|\}\{\[\]`~]*/g, '');
-        instance.bids.call(res).then((res) => {
-          _this.setState({ movies: [..._this.state.movies, movieName + ' [' + res + ']'] });
-        });
-      });
-    }
 
     this.state.web3.eth.getAccounts((error, accounts) => {
       sciFi.deployed().then((instance) => {
-        sciFiInstance = instance;
-        console.log(instance);
+        this.setState({ sciFiInstance: instance });
+        this.setState({ account: accounts[0] });
 
-        var name = this.state.web3.fromAscii('Terminator 2');        
-        sciFiInstance.vote(name, { value: 200, from: accounts[0] }).then((result) => {
+        this.voteForMovie('Terminator 2', () => {
           // Get the movies from the contract
-          sciFiInstance.movie_num.call().then((res) => {
-            var movieNum = res.c[0];
 
-            this.setState({ movieNum: movieNum });
-            this.setState({ movies: [] });
-
-            // Get list of movies with bids
-            for (var i = 0; i < movieNum; i++) {
-              setMovieDetails(sciFiInstance, this, i);
-            }
-
-          });
-
+          this.updateState();
         });
 
       });
@@ -105,6 +123,8 @@ class App extends Component {
                 })}
               </ul>
             </div>
+            <input value={this.state.toVote} onChange={this.updateValue.bind(this)}></input>
+            <button onClick={this.voteFromButton.bind(this)}>Vote</button>
           </div>
         </main>
       </div>
