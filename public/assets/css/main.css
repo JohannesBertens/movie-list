@@ -900,7 +900,6 @@
 				}
 
 			#thumbnails article h2, #thumbnails article p {
-				display: none;
 			}
 
 			#thumbnails article.active .thumbnail:before {

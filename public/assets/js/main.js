@@ -501,19 +501,7 @@ var main = (function($) { var _ = {
 				_.initProperties();
 				_.initViewer();
 				_.initEvents();
-	
-			// Initial slide.
-				window.setTimeout(function() {
-	
-					// Show first slide if xsmall isn't active or it just deactivated.
-						skel.on('-xsmall !xsmall', function() {
-	
-							if (_.current === null)
-								_.switchTo(0, true);
-	
-						});
-	
-				}, 0);
+
 	
 		},
 	
